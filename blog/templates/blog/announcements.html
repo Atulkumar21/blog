@@ -1,0 +1,13 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block content %}
+    <article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata">
+            <h1>New features of website comming soon....</h1>
+        </div>
+        <h2><a class="btn btn-outline-info" href="{% url 'blog-home' %}">Home</a></h2>
+    </div>
+    </article>
+{% endblock content %}
