@@ -15,6 +15,10 @@ body {
   .bg-steel {
     background-color: #5f788a;
   }
+
+  .like-dislike{
+    background-color: red !important;
+  }
   
   .site-header .navbar-nav .nav-link {
     color: #cbd5db;
@@ -62,7 +66,7 @@ body {
     color :white;
     text-decoration: none;
   }
-  
+
   .article-content {
     white-space: pre-line;
   }

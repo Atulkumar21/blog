@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -10,7 +12,41 @@ from django.views.generic import (
     DeleteView
 )
 
-# Create your views here.
+
+def like_post(request, pk):
+    post=get_object_or_404(Post, id=request.POST.get('post_id'))
+    liked= False
+    #disliked= False
+
+    if not post.likes.filter(id= request.user.id).exists() and post.dislikes.filter(id= request.user.id).exists():
+        post.dislikes.remove(request.user)
+        post.likes.add(request.user)
+        liked= False
+    elif post.likes.filter(id= request.user.id).exists():
+        post.likes.remove(request.user)
+        liked=False
+    elif not post.dislikes.filter(id= request.user.id).exists():
+        post.likes.add(request.user)
+        liked= True
+    return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
+
+
+def dislike_post(request, pk):
+    post=get_object_or_404(Post, id=request.POST.get('post_id'))
+    disliked= False
+    #liked=False
+    if not post.dislikes.filter(id= request.user.id).exists() and post.likes.filter(id= request.user.id).exists():
+        post.likes.remove(request.user)
+        post.dislikes.add(request.user)
+        liked= False
+    elif post.dislikes.filter(id= request.user.id).exists():
+        post.dislikes.remove(request.user)
+        disliked=False
+    elif not post.likes.filter(id= request.user.id).exists():
+        post.dislikes.add(request.user)
+        disliked= True
+    return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
+
 
 def home(request):
     posts=Post.objects.all()
@@ -46,6 +82,15 @@ class UserOwnPostListView(ListView):
 
 class PostDetailView(DetailView):
     model= Post
+    def get_context_data(self, *args, **kwargs):
+        context=super().get_context_data()
+        post_obj= get_object_or_404(Post, id=self.kwargs['pk'])
+        total_likes=post_obj.total_likes()
+        post_obj= get_object_or_404(Post, id=self.kwargs['pk'])
+        total_dislikes=post_obj.total_dislikes()
+        context["total_likes"]=total_likes
+        context["total_dislikes"]=total_dislikes
+        return context
 
 class PostCreateView(LoginRequiredMixin,CreateView):
     model=Post
@@ -89,7 +134,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post=self.get_object() #Gets the current post that we are updating.
         if self.request.user == post.author:
             return True
-        return False 
+        return False
 
 def about(request):
     return render(request,'blog/about.html',{'title':'About'})

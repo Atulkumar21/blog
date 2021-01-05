@@ -20,6 +20,9 @@ from users import views as user_views
 from django.conf import settings
 from django.conf.urls.static import static
 
+admin.site.site_header = "Blog Administration"
+admin.site.site_title= "Blog Admin"
+admin.site.index_title= "Welcome to Blog Admin Panel"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
