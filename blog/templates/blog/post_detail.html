@@ -17,6 +17,7 @@
         <p class="article-content">{{ object.content }}</p>
         <hr>
         <div>
+            {% if user.is_authenticated %}
             <form action="{% url 'post-like' post.pk %}" method="post">
                 {% csrf_token %}
                 <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-primary btn-sm">{{object.total_likes}} Like{{object.total_likes|pluralize}}</button>
@@ -25,6 +26,17 @@
                 {% csrf_token %}
                 <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-danger btn-sm">{{object.total_dislikes}} Dislike{{object.total_dislikes|pluralize}}</button>
             </form>
+            {% else %}
+            <form action="{% url 'post-like' post.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-primary btn-sm" disabled>{{object.total_likes}} Like{{object.total_likes|pluralize}}</button>
+            </form>
+            <form action="{% url 'post-dislike' post.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-danger btn-sm" disabled>{{object.total_dislikes}} Dislike{{object.total_dislikes|pluralize}}</button>
+            </form>
+            <p class="text-muted">Login to like or dilike the post....<a class="btn-sm btn-outline-info" href="{% url 'login' %}">Login</a></p>
+            {% endif %}
         </div>
     </div>
 </article>

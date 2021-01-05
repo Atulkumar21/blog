@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -13,38 +15,43 @@ from django.views.generic import (
 )
 
 
+@login_required
 def like_post(request, pk):
     post=get_object_or_404(Post, id=request.POST.get('post_id'))
     liked= False
-    #disliked= False
 
     if not post.likes.filter(id= request.user.id).exists() and post.dislikes.filter(id= request.user.id).exists():
         post.dislikes.remove(request.user)
         post.likes.add(request.user)
         liked= False
+        messages.success(request,f'You liked this post')
     elif post.likes.filter(id= request.user.id).exists():
         post.likes.remove(request.user)
         liked=False
+        messages.success(request,f'Removed from liked post')
     elif not post.dislikes.filter(id= request.user.id).exists():
         post.likes.add(request.user)
         liked= True
+        messages.success(request,f'You liked this post')
     return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
 
-
+@login_required
 def dislike_post(request, pk):
     post=get_object_or_404(Post, id=request.POST.get('post_id'))
     disliked= False
-    #liked=False
     if not post.dislikes.filter(id= request.user.id).exists() and post.likes.filter(id= request.user.id).exists():
         post.likes.remove(request.user)
         post.dislikes.add(request.user)
         liked= False
+        messages.success(request,f'You disliked this post')
     elif post.dislikes.filter(id= request.user.id).exists():
         post.dislikes.remove(request.user)
         disliked=False
+        messages.success(request,f'Removed from disliked post')
     elif not post.likes.filter(id= request.user.id).exists():
         post.dislikes.add(request.user)
         disliked= True
+        messages.success(request,f'You disliked this post')
     return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
 
 
