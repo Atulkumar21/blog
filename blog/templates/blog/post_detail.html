@@ -6,7 +6,7 @@
     <img class="rounded-circle article-img" src="{{object.author.profile.image.url}}">
     <div class="media-body">
         <div class="article-metadata">
-            <a class="mr-2" href="{% url 'user-posts' object.author.username %}">{{ object.author }}</a>
+            <a class="mr-2 badge badge-secondary" href="{% url 'user-posts' object.author.username %}">{{ object.author }}</a>
             <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
             {% if object.author == user %}
             <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.pk %}">Update</a>
@@ -16,28 +16,27 @@
         <h2 class="article-title">{{ object.title }}</h2>
         <p class="article-content">{{ object.content }}</p>
         <hr>
-        <div>
-            {% if user.is_authenticated %}
-            <form action="{% url 'post-like' post.pk %}" method="post">
+        {% if user.is_authenticated %}
+            <form class="likedislike" action="{% url 'post-like' post.pk %}" method="post">
                 {% csrf_token %}
                 <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-primary btn-sm">{{object.total_likes}} Like{{object.total_likes|pluralize}}</button>
             </form>
-            <form action="{% url 'post-dislike' post.pk %}" method="post">
+            <form class="likedislike" action="{% url 'post-dislike' post.pk %}" method="post">
                 {% csrf_token %}
                 <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-danger btn-sm">{{object.total_dislikes}} Dislike{{object.total_dislikes|pluralize}}</button>
             </form>
-            {% else %}
-            <form action="{% url 'post-like' post.pk %}" method="post">
+        {% else %}
+            <form class="likedislike" action="{% url 'post-like' post.pk %}" method="post">
                 {% csrf_token %}
                 <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-primary btn-sm" disabled>{{object.total_likes}} Like{{object.total_likes|pluralize}}</button>
             </form>
-            <form action="{% url 'post-dislike' post.pk %}" method="post">
+            <form class="likedislike" action="{% url 'post-dislike' post.pk %}" method="post">
                 {% csrf_token %}
                 <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-danger btn-sm" disabled>{{object.total_dislikes}} Dislike{{object.total_dislikes|pluralize}}</button>
             </form>
-            <p class="text-muted">Login to like or dilike the post....<a class="btn-sm btn-outline-info" href="{% url 'login' %}">Login</a></p>
-            {% endif %}
-        </div>
+            <p class="mt-2"><a class="btn-sm btn-outline-info" href="{% url 'login' %}">Login</a> to like or dislike posts....</p>
+        {% endif %}
+        <a class="btn btn-sm btn-outline-info position-left" href="{% url 'blog-home' %}">Home Page</a>
     </div>
 </article>
 {% endblock content %}
