@@ -83,13 +83,22 @@ class UserOwnPostListView(ListView):
 class PostDetailView(DetailView):
     model= Post
     def get_context_data(self, *args, **kwargs):
-        context=super().get_context_data()
+        context=super(PostDetailView, self).get_context_data()
         post_obj= get_object_or_404(Post, id=self.kwargs['pk'])
         total_likes=post_obj.total_likes()
-        post_obj= get_object_or_404(Post, id=self.kwargs['pk'])
         total_dislikes=post_obj.total_dislikes()
+        liked=False
+        disliked=False
+        if post_obj.likes.filter(id=self.request.user.id).exists():
+            liked=True
+        
+        if post_obj.dislikes.filter(id=self.request.user.id).exists():
+            disliked=True
+        
         context["total_likes"]=total_likes
         context["total_dislikes"]=total_dislikes
+        context["liked"]=liked
+        context["disliked"]=disliked
         return context
 
 class PostCreateView(LoginRequiredMixin,CreateView):
