@@ -18,18 +18,17 @@ from django.views.generic import (
 @login_required
 def like_post(request, pk):
     post=get_object_or_404(Post, id=request.POST.get('post_id'))
-    liked= False
 
     if not post.likes.filter(id= request.user.id).exists() and post.dislikes.filter(id= request.user.id).exists():
         post.dislikes.remove(request.user)
         post.likes.add(request.user)
-        messages.success(request,f'You liked this post.')
+        messages.success(request,f'Added to liked posts.')
     elif post.likes.filter(id= request.user.id).exists():
         post.likes.remove(request.user)
         messages.success(request,f'Removed from liked post.')
     elif not post.dislikes.filter(id= request.user.id).exists():
         post.likes.add(request.user)
-        messages.success(request,f'You liked this post.')
+        messages.success(request,f'Added to liked posts.')
     return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
 
 @login_required
@@ -59,6 +58,16 @@ class PostListView(ListView):
     context_object_name= 'posts'
     ordering= ['-date_posted']
     paginate_by= 5
+
+class UserLikedPostListView(ListView):
+    model=Post
+    template_name='blog/user_liked_post.html'
+    context_object_name='posts'
+    paginate_by=5
+
+    def get_queryset(self):
+        user=get_object_or_404(User, username=self.request.user)
+        return user.likes.all()
 
 class UserPostListView(ListView):
     model= Post
